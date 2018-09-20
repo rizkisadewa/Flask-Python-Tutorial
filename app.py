@@ -5,10 +5,20 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
+
+# Config MySQL
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'myflaskapp'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
+mysql = MySQL(app)
+
 #use the function of Article() so that we can return the value of the data
 Articles = Articles()
 
-mysql = MySQL()
+
 
 # Create a route
 @app.route('/')
