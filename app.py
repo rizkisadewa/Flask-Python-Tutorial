@@ -1,7 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging #stuff from Flask
 from data import Articles #import the data from data.py
-from flask_mysqldb import MySQL # import from MYSQL
-# from flask_mysqldb import MySql
+from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
@@ -71,7 +70,7 @@ def register():
 
         flash('You are now registered and can log in', 'success')
 
-        redirect(url_for('index'))
+        return redirect(url_for('index'))
     return render_template('register.html', form=form)
 
 if __name__ == '__main__':
