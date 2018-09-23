@@ -1,6 +1,7 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging #stuff from Flask
 from data import Articles #import the data from data.py
-from flaskext.mysql import MySQL # import from MYSQL
+from flask_mysqldb import MySQL # import from MYSQL
+# from flask_mysqldb import MySql
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
@@ -17,8 +18,6 @@ mysql = MySQL(app)
 
 #use the function of Article() so that we can return the value of the data
 Articles = Articles()
-
-
 
 # Create a route
 @app.route('/')
@@ -53,8 +52,28 @@ class RegisterFrom(Form):
 def register():
     form = RegisterFrom(request.form)
     if request.method == 'POST' and form.validate():
-        return render_template('register.html')
+        name = form.name.data
+        email = form.email.data
+        username = form.username.data
+        password = sha256_crypt.encrypt(str(form.password.data))
+
+        # Create a cursor
+        cur = mysql.connection.cursor()
+
+        # Execute query
+        cur.execute("INSERT INTO users(name, email, username, password) VALUES(%s,%s,%s,%s)", (name, email, username, password))
+
+        # Commit to DB
+        mysql.connection.commit()
+
+        # Close connection
+        cur.close()
+
+        flash('You are now registered and can log in', 'success')
+
+        redirect(url_for('index'))
     return render_template('register.html', form=form)
 
 if __name__ == '__main__':
+    app.secret_key='secret123'
     app.run(debug=True)
