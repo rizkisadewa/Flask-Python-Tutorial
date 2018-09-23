@@ -70,8 +70,37 @@ def register():
 
         flash('You are now registered and can log in', 'success')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        #Get form fields
+        username = request.form('username')
+        password_candidate = request.form('password')
+
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        #Get user by Username
+        result = cur.execute("SELECT FROM users WHERE username = %s", [username])
+
+        if result > 0:
+            # Get stored hash
+            data = cur.fetchone()
+            password = data['password']
+
+            # Compare Password
+            if sha256_crypt.verify(password_candidate, password):
+                app.logger.info("PASSWORD MATCHED")
+            else:
+                app.logger.info("PASSWORD NOT MATCHED")
+        else:
+            app.loger.info("NO USER")
+
+    return render_template('login.html')
+
 
 if __name__ == '__main__':
     app.secret_key='secret123'
